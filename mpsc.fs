@@ -1,11 +1,15 @@
 open System
 open System.Collections.Concurrent
 
-let queue = ConcurrentQueue<string>()
+let blockingQueue = new BlockingCollection<string>(ConcurrentQueue<string>())
 
 let consume() =
+    while true do
+        let msg = blockingQueue.Take()
+        Console.ForegroundColor <- ConsoleColor.Cyan
+        eprintfn "and %s: ..." msg
+        Console.ForegroundColor <- ConsoleColor.White
     Console.ForegroundColor <- ConsoleColor.DarkCyan
-    Seq.iter (eprintfn "and %s: ...") queue
     eprintfn "That's all."
     Console.ForegroundColor <- ConsoleColor.White
 
@@ -19,5 +23,5 @@ let main _ =
         printf "What else can you tell me? "
         Console.ForegroundColor <- ConsoleColor.White
         Console.ReadLine().Split ' '
-        |> Array.iter queue.Enqueue
+        |> Array.iter blockingQueue.Add
     0
